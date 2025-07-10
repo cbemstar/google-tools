@@ -561,6 +561,11 @@
             gap: var(--space-6);
             flex-direction: row;
         }
+        .ad-preview-text {
+            flex: 1;
+            min-width: 0;
+            padding-right: calc(72px + var(--space-6)); /* Reserve space for image on right */
+        }
         .ad-image {
             width: 72px;
             height: 72px;
@@ -580,6 +585,9 @@
                 flex-direction: column;
                 align-items: stretch;
                 position: static;
+            }
+            .ad-preview-text {
+                padding-right: 0;
             }
             .ad-image {
                 width: 100%;
@@ -1091,7 +1099,7 @@ function renderPreview(mode) {
             html += `<div class="ad-image" style="display:flex;align-items:center;justify-content:center;color:var(--muted-foreground);font-size:2.5em;">🖼️</div>`;
         }
     }
-    html += '<div style="flex:1;min-width:0;">';
+    html += '<div class="ad-preview-text">';
     // Headlines (show up to 3, joined by ' | ')
     html += `<div class="ad-title">${headlines.slice(0,3).join(' | ') || '<span style="color:var(--muted-foreground)">Your ad title will appear here</span>'}</div>`;
     // Description (show up to 2, joined by ' ')
@@ -1126,7 +1134,7 @@ function renderPreview(mode) {
     if (callExtension) {
         html += `<div class="call-extension">Call: <a href="tel:${callExtension}">${callExtension}</a></div>`;
     }
-    html += '</div>';
+    html += '</div>'; // end ad-preview-text
     // Desktop: absolutely position image top right
     if (!isMobile) {
         if (imageAssetDataUrl) {
