@@ -555,29 +555,40 @@
             scroll-behavior: smooth;
         }
         .ad-preview-row {
+            position: relative;
             display: flex;
             align-items: flex-start;
             gap: var(--space-6);
+            flex-direction: row;
         }
         .ad-image {
-            width: 120px;
-            height: 120px;
+            width: 72px;
+            height: 72px;
             object-fit: cover;
-            border-radius: var(--radius);
+            border-radius: 12px;
             background: var(--muted);
             border: 1.5px solid var(--border);
             flex-shrink: 0;
             display: block;
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 1;
         }
         @media (max-width: 768px) {
             .ad-preview-row {
                 flex-direction: column;
                 align-items: stretch;
+                position: static;
             }
             .ad-image {
                 width: 100%;
                 height: 180px;
                 margin-bottom: var(--space-4);
+                border-radius: 16px;
+                position: static;
+                top: auto;
+                right: auto;
             }
         }
         .ad-sponsored-row {
@@ -984,7 +995,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('callExtension').addEventListener('input', () => { renderPreview(); renderValidation(); });
     
     // Image upload
-    let imageAssetDataUrl = '';
     const imageInput = document.getElementById('imageAsset');
     const imageInfo = document.getElementById('imageAsset-info');
     imageInput.addEventListener('change', (e) => {
@@ -1071,20 +1081,21 @@ function renderPreview(mode) {
     
     // Sponsored label and URL row
     html += `<div class="ad-sponsored-row"><span>Sponsored</span><span class="ad-sponsored-dot">•</span><span>${displayUrl}${path1 ? '/' + path1 : ''}${path2 ? '/' + path2 : ''}</span></div>`;
-    // Ad preview row (image + text)
+    // Ad preview row (text + image absolutely positioned top right for desktop, image above for mobile)
     html += '<div class="ad-preview-row">';
-    // Image asset
-    if (imageAssetDataUrl) {
-        html += `<img class="ad-image" src="${imageAssetDataUrl}" alt="Ad image">`;
-    } else {
-        html += `<div class="ad-image" style="display:flex;align-items:center;justify-content:center;color:var(--muted-foreground);font-size:2.5em;">🖼️</div>`;
+    if (isMobile) {
+        // Mobile: image above
+        if (imageAssetDataUrl) {
+            html += `<img class="ad-image" src="${imageAssetDataUrl}" alt="Ad image">`;
+        } else {
+            html += `<div class="ad-image" style="display:flex;align-items:center;justify-content:center;color:var(--muted-foreground);font-size:2.5em;">🖼️</div>`;
+        }
     }
-    // Ad text
     html += '<div style="flex:1;min-width:0;">';
     // Headlines (show up to 3, joined by ' | ')
     html += `<div class="ad-title">${headlines.slice(0,3).join(' | ') || '<span style="color:var(--muted-foreground)">Your ad title will appear here</span>'}</div>`;
     // Description (show up to 2, joined by ' ')
-    html += `<div class="ad-description">${descriptions.slice(0,2).join(' ') || '<span style=\"color:var(--muted-foreground)\">Your ad description will appear here.</span>'}</div>`;
+    html += `<div class="ad-description">${descriptions.slice(0,2).join(' ') || '<span style="color:var(--muted-foreground)">Your ad description will appear here.</span>'}</div>`;
     // Extensions
     html += '<div class="ad-extensions">';
     // Sitelinks
@@ -1116,7 +1127,14 @@ function renderPreview(mode) {
         html += `<div class="call-extension">Call: <a href="tel:${callExtension}">${callExtension}</a></div>`;
     }
     html += '</div>';
-    html += '</div>'; // end ad text
+    // Desktop: absolutely position image top right
+    if (!isMobile) {
+        if (imageAssetDataUrl) {
+            html += `<img class="ad-image" src="${imageAssetDataUrl}" alt="Ad image">`;
+        } else {
+            html += `<div class="ad-image" style="display:flex;align-items:center;justify-content:center;color:var(--muted-foreground);font-size:2.5em;">🖼️</div>`;
+        }
+    }
     html += '</div>'; // end ad-preview-row
     document.getElementById('ad-preview').innerHTML = html;
 }
@@ -1197,6 +1215,8 @@ function renderValidation() {
 }
 
 // --- Theme Toggle ---
+// --- Global image asset variable ---
+let imageAssetDataUrl = '';
 function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
