@@ -612,6 +612,14 @@
             font-size: 1.2em;
             line-height: 0;
         }
+        @media (max-width: 480px) {
+            #theme-toggle-label {
+                display: none;
+            }
+            #theme-toggle {
+                gap: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -619,7 +627,7 @@
     <div class="header">
         <h1>Google Ads RSA Comprehensive Preview Tool</h1>
         <p>Simulate and preview your Responsive Search Ads with all major features and extensions.</p>
-        <button id="theme-toggle" class="btn btn-secondary btn-sm" style="position:absolute;top:24px;right:24px;z-index:2;">
+        <button id="theme-toggle" class="btn btn-secondary btn-sm" aria-label="Toggle theme" style="position:absolute;top:24px;right:24px;z-index:2;">
             <span id="theme-toggle-icon" aria-hidden="true">🌙</span> <span id="theme-toggle-label">Dark Mode</span>
         </button>
     </div>
@@ -1230,12 +1238,15 @@ function setTheme(theme) {
     localStorage.setItem('theme', theme);
     const icon = document.getElementById('theme-toggle-icon');
     const label = document.getElementById('theme-toggle-label');
+    const toggle = document.getElementById('theme-toggle');
     if (theme === 'dark') {
         icon.textContent = '☀️';
         label.textContent = 'Light Mode';
+        toggle.setAttribute('aria-label', 'Switch to light mode');
     } else {
         icon.textContent = '🌙';
         label.textContent = 'Dark Mode';
+        toggle.setAttribute('aria-label', 'Switch to dark mode');
     }
 }
 
